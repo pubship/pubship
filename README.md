@@ -22,7 +22,7 @@ This starts the stdio server, which waits for an MCP client. For a credential-fr
 uvx pubship --check
 ```
 
-Version 0.24.0 is the first PubShip release candidate. PyPI and MCP Registry publication are separate steps and are not implied by this checkout. Until published, use `uv run pubship --check` from the source checkout after `uv sync`.
+The commands above install the published PyPI package. A source checkout may contain changes that are not yet published; after `uv sync`, use `uv run pubship --check` to check the local version.
 
 ## Connect an assistant
 
@@ -39,6 +39,10 @@ Set the environment variables above in the shell launching your client. Restart 
 ```sh
 codex mcp add pubship -- uvx pubship
 ```
+
+### Cursor and Gemini CLI
+
+Client manifests in this repository declare the local service-account key path and package names. See [client setup](docs/clients.md) for configuration and the Gemini CLI installation command. For agent-assisted installation, read [llms-install.md](llms-install.md). Provide only the key file path, never its contents.
 
 ### Generic MCP harness
 

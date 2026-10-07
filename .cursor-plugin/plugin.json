@@ -1,0 +1,37 @@
+{
+  "name": "pubship",
+  "version": "0.24.1",
+  "description": "Open-source MCP server for Google Play developer workflows. Runs locally with your own credentials.",
+  "author": {
+    "name": "Denys Vorobyov"
+  },
+  "homepage": "https://pubship.dev",
+  "repository": "https://github.com/pubship/pubship",
+  "license": "AGPL-3.0-only",
+  "keywords": [
+    "mcp",
+    "google-play",
+    "android",
+    "app-release"
+  ],
+  "logo": "assets/logo.png",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "GOOGLE_APPLICATION_CREDENTIALS": {
+        "type": "string",
+        "title": "Service account key file",
+        "description": "Absolute path to your Google service account JSON key file on this computer."
+      },
+      "GOOGLE_PLAY_PACKAGES": {
+        "type": "string",
+        "title": "Package names",
+        "description": "Comma-separated Google Play package names PubShip may access, for example com.example.app."
+      }
+    },
+    "required": [
+      "GOOGLE_APPLICATION_CREDENTIALS",
+      "GOOGLE_PLAY_PACKAGES"
+    ]
+  }
+}

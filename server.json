@@ -3,7 +3,7 @@
   "name": "io.github.pubship/pubship",
   "title": "PubShip",
   "description": "Google Play reads and explicitly opted-in operations using your own local Google access.",
-  "version": "0.24.0",
+  "version": "0.24.1",
   "repository": {
     "url": "https://github.com/pubship/pubship",
     "source": "github"
@@ -14,7 +14,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "pubship",
-      "version": "0.24.0",
+      "version": "0.24.1",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"

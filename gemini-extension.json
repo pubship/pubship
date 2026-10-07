@@ -1,0 +1,27 @@
+{
+  "name": "pubship",
+  "version": "0.24.1",
+  "description": "Open-source MCP server for Google Play developer workflows. Runs locally with your own credentials.",
+  "mcpServers": {
+    "pubship": {
+      "command": "uvx",
+      "args": [
+        "pubship"
+      ]
+    }
+  },
+  "settings": [
+    {
+      "name": "Service account key file",
+      "description": "Absolute path to your Google service account JSON key file on this computer.",
+      "envVar": "GOOGLE_APPLICATION_CREDENTIALS",
+      "sensitive": false
+    },
+    {
+      "name": "Package names",
+      "description": "Comma-separated Google Play package names PubShip may access, for example com.example.app.",
+      "envVar": "GOOGLE_PLAY_PACKAGES",
+      "sensitive": false
+    }
+  ]
+}

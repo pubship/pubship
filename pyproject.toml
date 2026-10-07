@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pubship"
-version = "0.24.0"
+version = "0.24.1"
 description = "Open-source MCP server for Google Play developer workflows. Runs locally with your own credentials."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -18,7 +18,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pubship/pubship"
+Homepage = "https://pubship.dev"
+Repository = "https://github.com/pubship/pubship"
 Issues = "https://github.com/pubship/pubship/issues"
 
 [project.scripts]
@@ -46,6 +47,7 @@ dev = [
 packages = ["src/pubship"]
 
 [tool.hatch.build.targets.sdist]
+exclude = ["/mcp.json", "/.cursor-plugin", "/gemini-extension.json", "/assets/logo.png", "/logo.png", "/llms-install.md"]
 include = ["src", "tests", "scripts", "api", "docs", "pyproject.toml", "uv.lock", "README.md", "server.json", "CHANGELOG.md", "Dockerfile", ".dockerignore", "LICENSE", "AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "SECURITY.md", "LEGAL.md", "THIRD_PARTY_NOTICES.md", "TRADEMARKS.md"]
 
 [tool.pytest.ini_options]

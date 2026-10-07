@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.24.1
+
+### Added
+
+- Cursor plugin and Gemini CLI extension manifests for local setup with your own credentials.
+- `llms-install.md` for agent-assisted installation and a 400 by 400 pixel PubShip logo.
+
+### Changed
+
+- PyPI Homepage points to https://pubship.dev; Repository and Issues link to GitHub.
+
 ## 0.24.0
 
 - Distribution, import package and MCP name are `pubship`. Commands are `pubship` and `pubship-server`.

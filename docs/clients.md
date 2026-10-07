@@ -39,6 +39,34 @@ codex mcp list
 Use absolute paths. Shell aliases and desktop application PATH values may differ.
 `GOOGLE_PLAY_GCLOUD` can point to the actual gcloud executable when needed.
 
+## Cursor plugin
+
+The repository contains `.cursor-plugin/plugin.json` and root `mcp.json`. Configure
+`GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to your local service-account
+JSON key file and `GOOGLE_PLAY_PACKAGES` with a comma-separated app allowlist. The
+plugin starts `uvx pubship`; install uv first and keep `uvx` available to Cursor.
+Never enter the JSON key contents in a plugin setting. Adding the manifest does not
+mean the plugin has been accepted into Cursor's marketplace. The generic stdio
+configuration in [README](../README.md#generic-mcp-harness) remains available.
+
+## Gemini CLI
+
+Install uv first, then run this command in a terminal after the extension manifest
+is available on the repository's default branch:
+
+```sh
+gemini extensions install https://github.com/pubship/pubship
+```
+
+Enter the absolute path to your local service-account JSON key file and the
+comma-separated package names when prompted. These settings declare the environment
+variables passed to the MCP process; the extension starts `uvx pubship`. The settings
+contain a path and package names, not the key contents. Restart Gemini CLI after
+installation and verify that the client lists PubShip's tools. The credential-free
+`uvx pubship --check` checks the installed version without calling Google.
+
+See the [Gemini CLI extension reference](https://geminicli.com/docs/extensions/reference/).
+
 ## Other stdio clients
 
 Use the executable above as the command, no arguments, and your app allowlist as

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "pubship": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "pubship"
+      ],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
+        "GOOGLE_PLAY_PACKAGES": "${GOOGLE_PLAY_PACKAGES}"
+      }
+    }
+  }
+}

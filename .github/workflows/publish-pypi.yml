@@ -1,0 +1,56 @@
+name: Publish accepted package to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Accepted regular release tag (vX.Y.Z)
+        required: true
+        type: string
+      accepted_commit:
+        description: Accepted full 40-character source commit
+        required: true
+        type: string
+      checksums_sha256:
+        description: Independently accepted SHA256SUMS file SHA-256
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-pypi
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && github.repository == 'pubship/pubship'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Configure required reviewers and main-only deployment before use.
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pubship
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify accepted source, CI and immutable release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          ACCEPTED_COMMIT: ${{ inputs.accepted_commit }}
+          CHECKSUMS_SHA256: ${{ inputs.checksums_sha256 }}
+        run: python3 scripts/prepare_pypi_release.py
+      - name: Upload the verified bytes with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1 verified 2026-10-06
+        with:
+          packages-dir: publish-dist/
+          skip-existing: false
+          attestations: true

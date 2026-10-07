@@ -1,0 +1,7 @@
+{
+  "version": "0.24.0",
+  "remote": "root@source.example.invalid",
+  "identity_file": "/var/lib/pubship-backup/ssh-key",
+  "known_hosts_file": "/etc/pubship-backup/known_hosts",
+  "state_directory": "/var/lib/pubship-backup"
+}

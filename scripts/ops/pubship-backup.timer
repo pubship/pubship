@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily PubShip encrypted off-server backup
+
+[Timer]
+OnCalendar=*-*-* 03:17:00 UTC
+RandomizedDelaySec=15m
+Persistent=true
+Unit=pubship-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Python ${{ matrix.python }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.14']
+        os: [ubuntu-latest]
+        include:
+          - python: '3.14'
+            os: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+      - name: Install checksum-pinned age for backup integration tests
+        shell: bash
+        run: |
+          case "$RUNNER_OS/$RUNNER_ARCH" in
+            Linux/X64)
+              archive=age-v1.3.2-linux-amd64.tar.gz
+              digest=cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10 ;;
+            macOS/ARM64)
+              archive=age-v1.3.2-darwin-arm64.tar.gz
+              digest=e2020b073c44f692685a24d6abc378817eb81ffaaf49fd0531ef8565f767f2f5 ;;
+            macOS/X64)
+              archive=age-v1.3.2-darwin-amd64.tar.gz
+              digest=1d1e4bc66e1427edad7739ae7616157de0e79db8b6d2a1497d7d9925fb06a539 ;;
+            *) echo 'Unsupported operator-test platform'; exit 1 ;;
+          esac
+          mkdir "$RUNNER_TEMP/pubship-age"
+          cd "$RUNNER_TEMP/pubship-age"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            --max-time 120 --output age.tar.gz \
+            "https://github.com/FiloSottile/age/releases/download/v1.3.2/$archive"
+          printf '%s  age.tar.gz\n' "$digest" | shasum -a 256 --check
+          tar -xzf age.tar.gz age/age age/age-keygen
+          ./age/age --version
+          ./age/age-keygen --version
+          echo "$RUNNER_TEMP/pubship-age/age" >> "$GITHUB_PATH"
+      - run: uv sync --frozen --all-extras
+      - run: uv run --frozen --all-extras ruff check .
+      - run: uv run --frozen --all-extras ruff format --check .
+      - run: uv run --frozen --all-extras python scripts/generate_catalog.py --check
+      - run: uv run --frozen --all-extras python scripts/generate_verification.py --check
+      - run: uv run --frozen --all-extras python scripts/distribution_metadata.py --check
+      - run: uv run --frozen --all-extras pytest --cov=pubship --cov-report=term-missing
+      - run: uv build
+      - run: uv run --frozen --all-extras python scripts/check_artifacts.py
+      - name: Verify wheel outside checkout
+        shell: bash
+        run: |
+          uv venv "$RUNNER_TEMP/pubship-wheel"
+          uv pip install --python "$RUNNER_TEMP/pubship-wheel/bin/python" dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/pubship-wheel/bin/python" -c 'from pubship.catalog import catalog; assert len(catalog()["methods"]) > 0'
+
+  browser:
+    name: Hosted consent / Chromium, Firefox, WebKit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: '3.14'
+          enable-cache: true
+      - run: uv sync --frozen --all-extras --group browser
+      - name: Install all required browser engines and system dependencies
+        run: uv run --frozen --all-extras --group browser playwright install --with-deps chromium firefox webkit
+      - name: Exercise native consent forms without external HTTP requests
+        run: uv run --frozen --all-extras --group browser pytest tests/browser -v
+
+  container:
+    name: Non-root hosted image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker build -t pubship:ci .
+      - name: Inspect runtime without Google credentials
+        shell: bash
+        run: |
+          test "$(docker inspect --format '{{.Config.User}}' pubship:ci)" = '10001:10001'
+          docker run --rm pubship:ci --help
+          docker run --rm --entrypoint python pubship:ci -c 'from pubship.catalog import catalog; assert len(catalog()["methods"]) == 172'
+          if docker run --rm pubship:ci > "$RUNNER_TEMP/hosted-without-config.log" 2>&1; then
+            echo 'Hosted process unexpectedly started without its own configuration.'
+            exit 1
+          fi
+      - name: Exercise configured hosted container with synthetic private volumes
+        run: python3 scripts/test_hosted_container.py --image pubship:ci

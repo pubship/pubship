@@ -1,0 +1,216 @@
+{
+  "name": "storage",
+  "resources": {
+    "objects": {
+      "methods": {
+        "get": {
+          "description": "Retrieves an object or its metadata.",
+          "httpMethod": "GET",
+          "id": "storage.objects.get",
+          "parameterOrder": [
+            "bucket",
+            "object"
+          ],
+          "parameters": {
+            "bucket": {
+              "description": "Name of the bucket in which the object resides.",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            },
+            "generation": {
+              "description": "If present, selects a specific revision of this object (as opposed to the latest version, the default).",
+              "format": "int64",
+              "location": "query",
+              "type": "string"
+            },
+            "ifGenerationMatch": {
+              "description": "Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.",
+              "format": "int64",
+              "location": "query",
+              "type": "string"
+            },
+            "ifGenerationNotMatch": {
+              "description": "Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.",
+              "format": "int64",
+              "location": "query",
+              "type": "string"
+            },
+            "ifMetagenerationMatch": {
+              "description": "Makes the operation conditional on whether the object's current metageneration matches the given value.",
+              "format": "int64",
+              "location": "query",
+              "type": "string"
+            },
+            "ifMetagenerationNotMatch": {
+              "description": "Makes the operation conditional on whether the object's current metageneration does not match the given value.",
+              "format": "int64",
+              "location": "query",
+              "type": "string"
+            },
+            "object": {
+              "description": "Name of the object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            },
+            "projection": {
+              "description": "Set of properties to return. Defaults to noAcl.",
+              "enum": [
+                "full",
+                "noAcl"
+              ],
+              "enumDescriptions": [
+                "Include all properties.",
+                "Omit the owner, acl property."
+              ],
+              "location": "query",
+              "type": "string"
+            },
+            "restoreToken": {
+              "description": "Restore token used to differentiate soft-deleted objects with the same name and generation. Only applicable for hierarchical namespace buckets and if softDeleted is set to true. This parameter is optional, and is only required in the rare case when there are multiple soft-deleted objects with the same name and generation.",
+              "location": "query",
+              "type": "string"
+            },
+            "softDeleted": {
+              "description": "If true, only soft-deleted object versions will be listed. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).",
+              "location": "query",
+              "type": "boolean"
+            },
+            "userProject": {
+              "description": "The project to be billed for this request. Required for Requester Pays buckets.",
+              "location": "query",
+              "type": "string"
+            }
+          },
+          "path": "b/{bucket}/o/{object}",
+          "response": {
+            "$ref": "Object"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ],
+          "supportsMediaDownload": true,
+          "useMediaDownloadService": true
+        },
+        "list": {
+          "description": "Retrieves a list of objects matching the criteria.",
+          "httpMethod": "GET",
+          "id": "storage.objects.list",
+          "parameterOrder": [
+            "bucket"
+          ],
+          "parameters": {
+            "bucket": {
+              "description": "Name of the bucket in which to look for objects.",
+              "location": "path",
+              "required": true,
+              "type": "string"
+            },
+            "delimiter": {
+              "description": "Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.",
+              "location": "query",
+              "type": "string"
+            },
+            "endOffset": {
+              "description": "Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).",
+              "location": "query",
+              "type": "string"
+            },
+            "filter": {
+              "description": "Filter the returned objects. Currently only supported for the contexts field. If delimiter is set, the returned prefixes are exempt from this filter.",
+              "location": "query",
+              "type": "string"
+            },
+            "includeFoldersAsPrefixes": {
+              "description": "Only applicable if delimiter is set to '/'. If true, will also include folders and managed folders (besides objects) in the returned prefixes.",
+              "location": "query",
+              "type": "boolean"
+            },
+            "includeTrailingDelimiter": {
+              "description": "If true, objects that end in exactly one instance of delimiter will have their metadata included in items in addition to prefixes.",
+              "location": "query",
+              "type": "boolean"
+            },
+            "matchGlob": {
+              "description": "Filter results to objects and prefixes that match this glob pattern.",
+              "location": "query",
+              "type": "string"
+            },
+            "maxResults": {
+              "default": "1000",
+              "description": "Maximum number of items plus prefixes to return in a single page of responses. As duplicate prefixes are omitted, fewer total results may be returned than requested. The service will use this parameter or 1,000 items, whichever is smaller.",
+              "format": "uint32",
+              "location": "query",
+              "minimum": "0",
+              "type": "integer"
+            },
+            "pageToken": {
+              "description": "A previously-returned page token representing part of the larger set of results to view.",
+              "location": "query",
+              "type": "string"
+            },
+            "prefix": {
+              "description": "Filter results to objects whose names begin with this prefix.",
+              "location": "query",
+              "type": "string"
+            },
+            "projection": {
+              "description": "Set of properties to return. Defaults to noAcl.",
+              "enum": [
+                "full",
+                "noAcl"
+              ],
+              "enumDescriptions": [
+                "Include all properties.",
+                "Omit the owner, acl property."
+              ],
+              "location": "query",
+              "type": "string"
+            },
+            "softDeleted": {
+              "description": "If true, only soft-deleted object versions will be listed. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).",
+              "location": "query",
+              "type": "boolean"
+            },
+            "startOffset": {
+              "description": "Filter results to objects whose names are lexicographically equal to or after startOffset. If endOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).",
+              "location": "query",
+              "type": "string"
+            },
+            "userProject": {
+              "description": "The project to be billed for this request. Required for Requester Pays buckets.",
+              "location": "query",
+              "type": "string"
+            },
+            "versions": {
+              "description": "If true, lists all versions of an object as distinct results. The default is false. For more information, see [Object Versioning](https://cloud.google.com/storage/docs/object-versioning).",
+              "location": "query",
+              "type": "boolean"
+            }
+          },
+          "path": "b/{bucket}/o",
+          "response": {
+            "$ref": "Objects"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ],
+          "supportsSubscription": true
+        }
+      }
+    }
+  },
+  "revision": "20260926",
+  "rootUrl": "https://storage.googleapis.com/",
+  "servicePath": "storage/v1/",
+  "version": "v1"
+}

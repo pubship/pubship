@@ -1,0 +1,32 @@
+[Unit]
+Description=PubShip encrypted off-server backup
+Wants=network-online.target
+After=network-online.target
+OnFailure=pubship-backup-report.service
+
+[Service]
+Type=oneshot
+User=pubship-backup
+Group=pubship-backup
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/pubship-ops/operator_backup.py pull
+TimeoutStartSec=300
+TimeoutStopSec=15
+MemoryMax=256M
+TasksMax=16
+CPUQuota=50%
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/pubship-backup
+StandardOutput=journal
+StandardError=journal

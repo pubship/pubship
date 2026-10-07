@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pubship"
+version = "0.24.0"
+description = "Open-source MCP server for Google Play developer workflows. Runs locally with your own credentials."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "TRADEMARKS.md"]
+dependencies = [
+    "mcp==2.3.0",
+    "google-auth[requests]>=2.40,<3",
+    "jsonschema>=4.25,<5",
+    "cryptography>=50,<51",
+]
+
+[project.urls]
+Homepage = "https://github.com/pubship/pubship"
+Issues = "https://github.com/pubship/pubship/issues"
+
+[project.scripts]
+pubship = "pubship.server:main"
+pubship-server = "pubship.hosted:main"
+
+[project.optional-dependencies]
+hosted = [
+    "authlib>=1.6,<2",
+    "cryptography>=50,<51",
+    "uvicorn>=0.35,<1",
+]
+
+[dependency-groups]
+browser = [
+    "playwright>=1.63,<1.64",
+]
+dev = [
+    "pytest>=8,<10",
+    "pytest-cov>=6,<8",
+    "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pubship"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "scripts", "api", "docs", "pyproject.toml", "uv.lock", "README.md", "server.json", "CHANGELOG.md", "Dockerfile", ".dockerignore", "LICENSE", "AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "SECURITY.md", "LEGAL.md", "THIRD_PARTY_NOTICES.md", "TRADEMARKS.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

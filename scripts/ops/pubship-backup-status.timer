@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly PubShip backup age check
+
+[Timer]
+OnBootSec=5m
+OnUnitActiveSec=1h
+Unit=pubship-backup-status.service
+
+[Install]
+WantedBy=timers.target

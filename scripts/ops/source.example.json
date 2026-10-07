@@ -1,0 +1,6 @@
+{
+  "version": "0.24.0",
+  "container": "accepted-pubship-container",
+  "recipient_file": "/etc/pubship-backup/recipient.txt",
+  "state_directory": "/var/lib/pubship-backup-export"
+}

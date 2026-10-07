@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a reproducible failure without sharing credentials or private app data.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For vulnerabilities, use the private reporting link in SECURITY.md.
+        Never attach tokens, credential files, private reports or unredacted logs.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, MCP client and authentication mode. No account emails or secrets needed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps, expected behavior and actual behavior
+      description: Use synthetic package names and redacted errors.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Safe diagnostic evidence
+      description: Do not paste authorization headers, tokens, private review text or report rows.

@@ -1,0 +1,75 @@
+name: Publish accepted local MCP Registry entry
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Accepted regular release tag already published to PyPI (vX.Y.Z)
+        required: true
+        type: string
+      accepted_commit:
+        description: Accepted full 40-character source commit
+        required: true
+        type: string
+      checksums_sha256:
+        description: Independently accepted SHA256SUMS file SHA-256
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-mcp-registry
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && github.repository == 'pubship/pubship'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Configure required reviewers and main-only deployment before first use.
+    environment: mcp-registry
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify accepted release and public PyPI artifact parity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          ACCEPTED_COMMIT: ${{ inputs.accepted_commit }}
+          CHECKSUMS_SHA256: ${{ inputs.checksums_sha256 }}
+        run: python3 scripts/prepare_registry_release.py
+      - name: Install checksum-pinned official publisher
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            --max-time 120 --output mcp-publisher.tar.gz \
+            https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz
+          echo 'a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc  mcp-publisher.tar.gz' | sha256sum --check
+          tar -xzf mcp-publisher.tar.gz mcp-publisher
+      - name: Publish verified local manifest with GitHub OIDC
+        shell: bash
+        run: |
+          umask 077
+          publisher="$RUNNER_TEMP/mcp-publisher"
+          trap '"$publisher" logout >/dev/null 2>&1 || true; rm -f "$RUNNER_TEMP/mcp-registry-login.log" "$RUNNER_TEMP/mcp-registry-publish.log"' EXIT
+          # Upstream errors may include response bodies. Keep them off public CI logs.
+          if ! "$publisher" login github-oidc >"$RUNNER_TEMP/mcp-registry-login.log" 2>&1; then
+            echo 'Official publisher OIDC authentication failed.'
+            exit 1
+          fi
+          if ! "$publisher" publish registry-release/server.json >"$RUNNER_TEMP/mcp-registry-publish.log" 2>&1; then
+            echo 'Official publisher rejected publication; inspect existing registry version before retrying.'
+            exit 1
+          fi
+          echo 'Official publisher completed; verifying public metadata next.'
+      - name: Verify public Registry read-back
+        run: python3 scripts/prepare_registry_release.py --verify-published

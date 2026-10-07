@@ -1,0 +1,16 @@
+[Unit]
+Description=Check PubShip backup failure and age
+OnFailure=pubship-backup-report.service
+
+[Service]
+Type=oneshot
+User=pubship-backup
+Group=pubship-backup
+ExecStart=/usr/bin/python3 /opt/pubship-ops/operator_backup.py status
+TimeoutStartSec=30
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+StandardOutput=journal
+StandardError=journal

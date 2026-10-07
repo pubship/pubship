@@ -1,0 +1,24 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.pubship/pubship",
+  "title": "PubShip",
+  "description": "Google Play reads and explicitly opted-in operations using your own local Google access.",
+  "version": "0.24.0",
+  "repository": {
+    "url": "https://github.com/pubship/pubship",
+    "source": "github"
+  },
+  "websiteUrl": "https://pubship.dev",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "pubship",
+      "version": "0.24.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

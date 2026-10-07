@@ -1,0 +1,13 @@
+# An allowlist avoids sending credentials and local exports to the Docker daemon.
+**
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!src/
+!src/pubship/
+!src/pubship/*.py
+!src/pubship/methods.json
+!src/pubship/contracts.json
+!THIRD_PARTY_NOTICES.md
+!TRADEMARKS.md

@@ -4,7 +4,7 @@
 
 **Google Play developer workflows, from your own computer.** Inspect releases, understand reviews and reports, and prepare explicitly authorized changes from your MCP client.
 
-[![CI](https://github.com/pubship/pubship/actions/workflows/ci.yml/badge.svg)](https://github.com/pubship/pubship/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/pubship/pubship)](https://github.com/pubship/pubship/releases) [![AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-202020)](LICENSE)
+[![CI](https://github.com/pubship/pubship/actions/workflows/ci.yml/badge.svg)](https://github.com/pubship/pubship/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/pubship/pubship)](https://github.com/pubship/pubship/releases) [![AGPL-3.0-only](https://img.shields.io/badge/license-AGPL--3.0--only-202020)](LICENSE) [![PubShip MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/pubship/pubship/badges/score.svg)](https://glama.ai/mcp/servers/pubship/pubship)
 
 ## Start locally
 

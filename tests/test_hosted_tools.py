@@ -303,8 +303,10 @@ from pubship.hosted_tools import build_hosted_tools
 from mcp.server import MCPServer
 provider = Provider()
 registry = HostedEditRegistry(provider)
+# A saved edit has one expiry; do not mutate metadata when the clock ticks.
+edit_expiry = str(int(time.time()) + 3600)
 def get(url, token, **kwargs):
-    return {"language":"en-US","title":"old"} if "/listings/" in url else {"id":"edit-1","expiryTimeSeconds":str(int(time.time())+3600)}
+    return {"language":"en-US","title":"old"} if "/listings/" in url else {"id":"edit-1","expiryTimeSeconds":edit_expiry}
 http.get = get
 publishing_http.listing_patch = lambda url, token, body, **kwargs: {"language":"en-US", **body}
 server = MCPServer("Synthetic stdio", tools=build_hosted_tools(provider,registry,principal))

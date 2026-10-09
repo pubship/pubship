@@ -60,7 +60,7 @@ def build_account_tools(settings, auth, safe_tool):
             fn,
             structured_output=True,
             annotations=ToolAnnotations(
-                read_only_hint=fn is not apply_account_access,
+                read_only_hint=fn is read_account_access,
                 destructive_hint=fn is apply_account_access,
                 idempotent_hint=fn is read_account_access,
                 open_world_hint=True,

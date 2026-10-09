@@ -513,7 +513,7 @@ with patch.object(Auth,"token",return_value="synthetic-stdio"),patch("urllib.req
         )
         async with Client(connection) as client:
             tools = {tool.name: tool for tool in (await client.list_tools()).tools}
-            assert tools["prepare_edit_write"].annotations.read_only_hint
+            assert not tools["prepare_edit_write"].annotations.read_only_hint
             assert not tools["apply_edit_write"].annotations.read_only_hint
             assert tools["apply_edit_write"].annotations.destructive_hint
             prepared = await client.call_tool(

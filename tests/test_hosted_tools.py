@@ -77,7 +77,24 @@ def test_hosted_tools_strict_schema_annotations_and_safe_capabilities(hosted_too
                 assert not any(key.startswith("_") for key in tool.input_schema["properties"])
                 assert tool.annotations.read_only_hint == (
                     not name.startswith("apply_")
-                    and name not in {"begin_upload_transfer", "discard_transfer"}
+                    and name
+                    not in {
+                        "begin_upload_transfer",
+                        "discard_transfer",
+                        "download_artifact",
+                        "prepare_artifact_upload",
+                        "prepare_internal_sharing_upload",
+                        "prepare_appstore_operation",
+                        "prepare_account_access",
+                        "prepare_edit_write",
+                        "prepare_monetization_write",
+                        "prepare_publisher_edit_operation",
+                        "prepare_purchase_operation",
+                        "prepare_signing_operation",
+                        "prepare_store_listing_update",
+                        "prepare_support_operation",
+                        "prepare_track_update",
+                    }
                 )
                 assert tool.annotations.destructive_hint == (
                     name.startswith("apply_") or name == "discard_transfer"
@@ -286,8 +303,10 @@ from pubship.hosted_tools import build_hosted_tools
 from mcp.server import MCPServer
 provider = Provider()
 registry = HostedEditRegistry(provider)
+# A saved edit has one expiry; do not mutate metadata when the clock ticks.
+edit_expiry = str(int(time.time()) + 3600)
 def get(url, token, **kwargs):
-    return {"language":"en-US","title":"old"} if "/listings/" in url else {"id":"edit-1","expiryTimeSeconds":str(int(time.time())+3600)}
+    return {"language":"en-US","title":"old"} if "/listings/" in url else {"id":"edit-1","expiryTimeSeconds":edit_expiry}
 http.get = get
 publishing_http.listing_patch = lambda url, token, body, **kwargs: {"language":"en-US", **body}
 server = MCPServer("Synthetic stdio", tools=build_hosted_tools(provider,registry,principal))

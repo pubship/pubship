@@ -44,7 +44,7 @@ def signing_tools(auth, safe_tool):
         tool = Tool.from_function(
             fn,
             annotations=ToolAnnotations(
-                read_only_hint=fn is prepare_signing_operation,
+                read_only_hint=False,
                 destructive_hint=fn is apply_signing_operation,
                 idempotent_hint=False,
                 open_world_hint=True,

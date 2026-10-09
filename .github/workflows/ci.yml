@@ -64,6 +64,14 @@ jobs:
       - run: uv run --frozen --all-extras python scripts/generate_catalog.py --check
       - run: uv run --frozen --all-extras python scripts/generate_verification.py --check
       - run: uv run --frozen --all-extras python scripts/distribution_metadata.py --check
+      - name: Check actual MCP tool definitions with pinned offline TDQS
+        if: matrix.python == '3.14' && matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group tdqs \
+            python scripts/export_tool_definitions.py --output-dir "$RUNNER_TEMP/pubship-tdqs" --lint
+          env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group tdqs \
+            python scripts/check_tool_definitions.py --reports-dir "$RUNNER_TEMP/pubship-tdqs"
       - run: uv run --frozen --all-extras pytest --cov=pubship --cov-report=term-missing
       - run: uv build
       - run: uv run --frozen --all-extras python scripts/check_artifacts.py

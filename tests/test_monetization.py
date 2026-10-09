@@ -424,7 +424,7 @@ def test_mcp_registry_local_only_and_annotations():
         async with Client(create_server(settings)) as client:
             tools = {t.name: t for t in (await client.list_tools()).tools}
             assert tools["query_monetization"].annotations.read_only_hint
-            assert tools["prepare_monetization_write"].annotations.read_only_hint
+            assert not tools["prepare_monetization_write"].annotations.read_only_hint
             assert tools["apply_monetization_write"].annotations.destructive_hint
             bad = await client.call_tool(
                 "prepare_monetization_write",

@@ -400,7 +400,7 @@ def test_real_local_mcp_signing_prepare_apply_replay_is_redacted(intent, monkeyp
     async def run():
         async with Client(create_server(Settings())) as client:
             tools = {tool.name: tool for tool in (await client.list_tools()).tools}
-            assert tools["prepare_signing_operation"].annotations.read_only_hint
+            assert not tools["prepare_signing_operation"].annotations.read_only_hint
             assert tools["apply_signing_operation"].annotations.destructive_hint
             assert not tools["apply_signing_operation"].annotations.idempotent_hint
             prepared = await client.call_tool(

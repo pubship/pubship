@@ -50,7 +50,7 @@ def test_mcp_wrong_scope_confirmation_and_strict_arguments_fail_before_auth(monk
     async def run():
         async with Client(create_server(configured())) as client:
             tools = {t.name: t for t in (await client.list_tools()).tools}
-            assert tools["prepare_purchase_operation"].annotations.read_only_hint
+            assert not tools["prepare_purchase_operation"].annotations.read_only_hint
             assert tools["apply_purchase_operation"].annotations.destructive_hint
             assert not tools["apply_purchase_operation"].annotations.idempotent_hint
             for name, arguments in (

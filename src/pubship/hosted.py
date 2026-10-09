@@ -19,6 +19,7 @@ import anyio
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from mcp.server.auth.middleware.auth_context import get_access_token
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions, RevocationOptions
+from mcp.server.mcpserver.tools import Tool
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp_types import ToolAnnotations
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -51,6 +52,7 @@ from .hosted_transfer_http import TransferHTTP, is_transfer_route
 from .hosted_transfers import HostedTransferStore
 from .oauth import READ_SCOPE, PlayOAuth
 from .server import create_server, safe_tool
+from .tool_metadata import enrich_tool
 from .vault import Vault
 
 COOKIE = "__Host-pubship-consent"
@@ -502,11 +504,6 @@ def create_hosted_app(settings, vault=None):
     async def transfer_content(request):
         return await transfer_http.content(request)
 
-    @server.tool(
-        annotations=ToolAnnotations(
-            read_only_hint=False, destructive_hint=True, idempotent_hint=True, open_world_hint=False
-        )
-    )
     @safe_tool
     async def disconnect_google_account() -> dict[str, str]:
         """Disconnect this authenticated customer connection and delete its Google grant.
@@ -518,6 +515,19 @@ def create_hosted_app(settings, vault=None):
         await anyio.to_thread.run_sync(provider.services, principal)
         await provider.revoke_token(principal)
         return {"status": "disconnected"}
+
+    disconnect_tool = Tool.from_function(
+        disconnect_google_account,
+        annotations=ToolAnnotations(
+            read_only_hint=False, destructive_hint=True, idempotent_hint=True, open_world_hint=False
+        ),
+    )
+    enrich_tool(disconnect_tool, hosted=True)
+    server.add_tool(
+        disconnect_google_account,
+        description=disconnect_tool.description,
+        annotations=disconnect_tool.annotations,
+    )
 
     @server.custom_route("/healthz", methods=["GET"])
     async def health(request):

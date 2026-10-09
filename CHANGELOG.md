@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Explain tool parameters, result semantics and mode-specific prerequisites in actual MCP definitions.
+- Correct prepare-operation and self-host download annotations to reflect their temporary state changes. Execution permissions and confirmation gates are unchanged; clients may adjust approval prompts.
+
+### Added
+
+- Pinned offline TDQS 1.2 lint for all three tool surfaces, with explicit review of structural heuristic candidates.
+- Contract regression checks for tool ordering, schemas, defaults, annotations and caller overrides.
+
 ## 0.24.1
 
 ### Added

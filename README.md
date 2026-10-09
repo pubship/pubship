@@ -100,6 +100,8 @@ There is no project-run Google-connected service. See [the local-first decision]
 
 ## Development
 
+[Tool definition quality](docs/tool-definition-quality.md) documents the TDQS 1.2 offline checks, reviewed heuristic findings and MCP contract regression coverage. Offline lint is not a model-scored grade.
+
 ```sh
 env -u GOOGLE_APPLICATION_CREDENTIALS uv sync --all-extras --group browser
 env -u GOOGLE_APPLICATION_CREDENTIALS uv run pytest

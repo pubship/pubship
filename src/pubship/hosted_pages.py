@@ -94,9 +94,10 @@ h1{letter-spacing:-.8px}}
 """
 
 MARK = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 32 32" aria-hidden="true" focusable="false">'
-    '<g fill="none" stroke="#202826" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'
-    '<path d="M8 25V7h9a6 6 0 0 1 0 12H8"/><path d="M17 25h8"/></g></svg>'
+    '<svg width="28" height="28" aria-hidden="true" focusable="false" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M 145 400 L 145 112 L 275 112 C 365 112, 365 272, 275 272 L 145 272" stroke="#000000" stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />'
+    '<path d="M 250 412 L 370 412" stroke="#000000" stroke-width="52" stroke-linecap="round" />'
+    "</svg>"
 )
 
 

@@ -417,9 +417,7 @@ def enrich_tool(tool: Tool, *, hosted: bool) -> None:
     if guidance is None:
         return
     if tool.name.startswith("prepare_"):
-        guidance += (
-            " Creates single-use preparation state in server memory; no Google mutation occurs."
-        )
+        guidance += " Creates single-use preparation state; no Google mutation occurs."
     if tool.name in {"list_api_methods", "describe_api_method"}:
         guidance += (
             " In self-hosted mode, inspect hosted availability and call "

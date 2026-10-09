@@ -36,7 +36,7 @@ These dispositions are narrowly keyed by profile, tool pair and cost. They do no
 
 Parameter descriptions explain formats, defaults, pagination, prerequisite allowlists and opaque operation identifiers. Tool descriptions distinguish local paths from self-host transfer handles, describe result semantics, and retain warnings about untrusted provider text and explicit write authorization. Self-host catalog inspection requires an authenticated connection even though it reads only pinned definitions.
 
-Prepare tools create single-use operations in memory. Their annotations are therefore non-read-only, non-destructive and non-idempotent. Self-host artifact download creates a temporary transfer and has the same hints. This intentionally corrects client-visible annotations and can affect a client's approval prompts. It does not change execution permissions, provider calls or confirmation gates.
+Prepare tools create single-use operation records; binary preparations can also retain private file snapshots or claim self-host transfer handles. Their annotations are therefore non-read-only, non-destructive and non-idempotent. Self-host artifact download creates a temporary transfer and has the same hints. This intentionally corrects client-visible annotations and can affect a client's approval prompts. It does not change execution permissions, provider calls or confirmation gates.
 
 Regression snapshots protect tool names, order, required fields, types, defaults, constraints, output schemas and all other annotations. Tests also preserve caller-supplied tool precedence, ensure enrichment is idempotent and confirm descriptions do not mutate shared schema objects. Existing execution, rejection, isolation and browser suites remain required.
 
@@ -46,4 +46,16 @@ Passing this offline gate is not an official TDQS grade. Model-scored evaluation
 
 A merged source improvement does not update an already published PyPI wheel or a directory's cached build. Package publication and directory refresh must be verified separately. No real Google operations are performed for this definition audit.
 
-Website synchronization reviewed the homepage's local installation and published-version claims, the permissions page's write opt-ins and mandatory self-host identity boundary, and directory links. No new website score claim is needed or authorized by offline lint results.
+## Website claim verification
+
+Checked the website source and live pages during this delivery:
+
+| Page | Exact claim or link checked | Result |
+| --- | --- | --- |
+| Home | `uvx pubship`; published version `0.24.1` | Correct for the existing PyPI release, not these unreleased source changes. |
+| Home | "Reads are the default. Changes require explicit configuration for the app and method, the necessary Play Console permissions, and the operation's review and execution steps." | Matches the unchanged execution gates. |
+| Permissions | "Self-hosting is for your own accounts"; "pubship-server needs an exact email allowlist and keeps enrollment closed by default. There is no project endpoint." | Matches mandatory verified identity and the project boundary. |
+| Permissions | "170 implemented methods from 172 inventory definitions. Tests use synthetic providers; implementation is not a claim of live Google verification." | No method inventory or provider-verification claim changed. |
+| Home, Featured on | `https://glama.ai/mcp/servers/pubship/pubship` | Directory link only; does not claim a new build or refreshed score. |
+
+No website change is needed for these definition improvements. No model-scored grade is implied by offline lint.

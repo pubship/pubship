@@ -47,7 +47,7 @@ dev = [
 packages = ["src/pubship"]
 
 [tool.hatch.build.targets.sdist]
-exclude = ["/mcp.json", "/.cursor-plugin", "/gemini-extension.json", "/assets/logo.png", "/logo.png", "/llms-install.md"]
+exclude = ["/mcp.json", "/.cursor-plugin", "/gemini-extension.json", "/assets", "/logo.png", "/llms-install.md"]
 include = ["src", "tests", "scripts", "api", "docs", "pyproject.toml", "uv.lock", "README.md", "server.json", "CHANGELOG.md", "Dockerfile", ".dockerignore", "LICENSE", "AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "SECURITY.md", "LEGAL.md", "THIRD_PARTY_NOTICES.md", "TRADEMARKS.md"]
 
 [tool.pytest.ini_options]

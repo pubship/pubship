@@ -1,7 +1,5 @@
 # PubShip
 
-<img src="https://raw.githubusercontent.com/pubship/pubship/main/assets/logo.png" alt="PubShip logo" width="128" height="128">
-
 <!-- mcp-name: io.github.pubship/pubship -->
 
 **Google Play developer workflows, from your own computer.** Inspect releases, understand reviews and reports, and prepare explicitly authorized changes from your MCP client.

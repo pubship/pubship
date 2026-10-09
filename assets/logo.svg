@@ -1,0 +1,6 @@
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">PubShip logo</title>
+  <rect width="512" height="512" rx="80" fill="#171610" />
+  <path d="M 145 400 L 145 112 L 275 112 C 365 112, 365 272, 275 272 L 145 272" stroke="#F8FAFC" stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 250 412 L 370 412" stroke="#F8FAFC" stroke-width="52" stroke-linecap="round" />
+</svg>

@@ -78,4 +78,4 @@ Pre-publication website check for 0.24.2, performed October 12, 2026:
 | Permissions | "170 implemented methods from 172 inventory definitions. Tests use synthetic providers; implementation is not a claim of live Google verification." | No method inventory or provider-verification claim changed. |
 | Home, Featured on | `https://glama.ai/mcp/servers/pubship/pubship` | Directory link only; does not claim a new build or refreshed score. |
 
-No website change is needed for these definition improvements. No model-scored grade is implied by offline lint.
+No capability-copy change is needed for these definition improvements; the homepage release label is tracked separately in [website PR #20](https://github.com/pubship/website/pull/20). PyPI and official MCP Registry publication are now verified in the [0.24.2 publication receipt](distribution.md#verified-0242-publication). This receipt does not change the historical pre-publication check above or imply a new model-scored grade.

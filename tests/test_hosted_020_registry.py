@@ -89,7 +89,9 @@ def context(provider, tmp_path, monkeypatch):
 
 
 def scenario(monkeypatch, method):
-    state = SimpleNamespace(method=method, gets=[], requests=[])
+    state = SimpleNamespace(
+        method=method, gets=[], requests=[], edit_expiry=int(time.time()) + 3600
+    )
     if method in HOSTED_APPSTORE_CAPABILITIES:
         state.kind = "appstore"
         parameters, body, mime, result = case(method)
@@ -132,7 +134,7 @@ def scenario(monkeypatch, method):
     def get(url, token):
         state.gets.append((url, token))
         if url.endswith("/edit1"):
-            return {"id": "edit1", "expiryTimeSeconds": str(int(time.time()) + 3600)}
+            return {"id": "edit1", "expiryTimeSeconds": str(state.edit_expiry)}
         if url.endswith("/listings"):
             return {"listings": [{"language": "en-US"}]}
         if "/listings/" in url:
@@ -248,6 +250,29 @@ def test_all_eighteen_registry_paths_use_actual_store_and_current_oauth(
         result = context.registry.apply(context.principal, state.kind, operation, operation)
         assert result["mutation_succeeded"] and result["operation_id"] == operation
         assert len(state.requests) == 1
+    assert not context.registry._records and not context.store._records
+
+
+@pytest.mark.parametrize("method", [PREFIX + "images.upload", EXTERNAL])
+@pytest.mark.parametrize("changed_metadata", [False, True])
+def test_edit_snapshot_across_clock_boundary(context, monkeypatch, method, changed_metadata):
+    # Time passing is not a provider-side edit change. Keep real production
+    # snapshot comparisons active, including rejection of a genuine mutation.
+    clock = {"now": int(time.time()) + 0.25}
+    monkeypatch.setattr(time, "time", lambda: clock["now"])
+    state = scenario(monkeypatch, method)
+    operation = prepare(context, state)["operation_id"]
+    clock["now"] += 1
+    if changed_metadata:
+        state.edit_expiry += 1
+        with pytest.raises(PlayError, match="Edit metadata changed"):
+            context.registry.apply(context.principal, state.kind, operation, operation)
+        assert not state.requests
+    else:
+        result = context.registry.apply(context.principal, state.kind, operation, operation)
+        assert result["mutation_succeeded"]
+        assert len(state.requests) == 1
+    assert len([url for url, _ in state.gets if url.endswith("/edit1")]) == 2
     assert not context.registry._records and not context.store._records
 
 
@@ -406,7 +431,7 @@ def test_shared_guard_covers_distribution_and_existing_listing_family(context, m
         lambda url, token: (
             {"language": "en-US", "title": "old"}
             if "/listings/" in url
-            else {"id": "edit1", "expiryTimeSeconds": str(int(time.time()) + 3600)}
+            else {"id": "edit1", "expiryTimeSeconds": str(state.edit_expiry)}
         ),
     )
     listing = context.registry.prepare(

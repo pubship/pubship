@@ -170,13 +170,83 @@ BASELINE_CONTRACTS = {
 
 
 def _without_descriptions(value):
+    """Remove annotation prose, never a property name or a literal JSON value."""
     if isinstance(value, dict):
-        return {
-            key: _without_descriptions(item) for key, item in value.items() if key != "description"
-        }
+        result = {}
+        for key, item in value.items():
+            if key == "description":
+                continue
+            if key in {
+                "properties",
+                "patternProperties",
+                "$defs",
+                "definitions",
+                "dependentSchemas",
+            }:
+                result[key] = {name: _without_descriptions(schema) for name, schema in item.items()}
+            elif key in {
+                "inputSchema",
+                "outputSchema",
+                "items",
+                "prefixItems",
+                "additionalProperties",
+                "unevaluatedProperties",
+                "additionalItems",
+                "unevaluatedItems",
+                "contains",
+                "propertyNames",
+                "allOf",
+                "anyOf",
+                "oneOf",
+                "not",
+                "if",
+                "then",
+                "else",
+            }:
+                result[key] = _without_descriptions(item)
+            else:
+                result[key] = item
+        return result
     if isinstance(value, list):
         return [_without_descriptions(item) for item in value]
     return value
+
+
+def test_contract_fingerprint_preserves_description_named_fields_and_literals():
+    from copy import deepcopy
+
+    baseline = {
+        "name": "synthetic",
+        "description": "Tool prose.",
+        "inputSchema": {
+            "properties": {
+                "description": {"type": "string", "description": "Parameter prose."},
+                "payload": {"default": {"description": "literal default"}},
+            },
+            "$defs": {"description": {"type": "string", "description": "Definition prose."}},
+            "enum": [{"description": "literal enum"}],
+            "const": {"description": "literal const"},
+        },
+        "annotations": {"description": "extension annotation"},
+    }
+    prose_only = deepcopy(baseline)
+    prose_only["description"] = "Updated tool prose."
+    prose_only["inputSchema"]["properties"]["description"]["description"] = "Updated parameter."
+    assert _fingerprint(prose_only) == _fingerprint(baseline)
+    for path in [
+        ("inputSchema", "properties", "description", "type"),
+        ("inputSchema", "properties", "payload", "default", "description"),
+        ("inputSchema", "$defs", "description", "type"),
+        ("inputSchema", "enum", 0, "description"),
+        ("inputSchema", "const", "description"),
+        ("annotations", "description"),
+    ]:
+        changed = deepcopy(baseline)
+        parent = changed
+        for segment in path[:-1]:
+            parent = parent[segment]
+        parent[path[-1]] = "changed"
+        assert _fingerprint(changed) != _fingerprint(baseline), path
 
 
 def _fingerprint(tool):

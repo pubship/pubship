@@ -19,6 +19,8 @@ The exporter uses synthetic configurations, a temporary vault and the real MCP S
 
 The development-only `tdqs` group pins the official Python CLI to 0.1.0 through `uv.lock`. It is not a PubShip runtime dependency. Its deterministic `lint` command needs no model key. Raw upstream JSON is preserved, including heuristic warnings. CI rejects missing parameter descriptions, flags, new findings and unreviewed structural candidates.
 
+The acceptance gate recomputes the pinned, deterministic lint result from the adjacent exported definitions. Every report field must match, including tool identities, input hashes, context signals, per-tool findings and aggregate findings. Only the nonempty generation timestamp may differ. Missing, null, stale or substituted report fields cannot silently turn into a clean result. Independent SDK contract fingerprints protect the identities and contracts of the source definitions themselves; matching a report to an export is not proof of that export's provenance.
+
 ### Reviewed structural candidates
 
 The upstream lint heuristic compares invocation cost without evaluating task equivalence. These exact candidates remain visible in its output:
@@ -39,6 +41,24 @@ Parameter descriptions explain formats, defaults, pagination, prerequisite allow
 Prepare tools create single-use operation records; binary preparations can also retain private file snapshots or claim self-host transfer handles. Their annotations are therefore non-read-only, non-destructive and non-idempotent. Self-host artifact download creates a temporary transfer and has the same hints. This intentionally corrects client-visible annotations and can affect a client's approval prompts. It does not change execution permissions, provider calls or confirmation gates.
 
 Regression snapshots protect tool names, order, required fields, types, defaults, constraints, output schemas and all other annotations. Tests also preserve caller-supplied tool precedence, ensure enrichment is idempotent and confirm descriptions do not mutate shared schema objects. Existing execution, rejection, isolation and browser suites remain required.
+
+### Exhaustive local acceptance scope
+
+```sh
+env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group tdqs pytest \
+  tests/test_tool_definition_quality.py tests/test_tool_definition_gate.py \
+  tests/test_tool_definition_export.py tests/test_tool_definition_artifacts.py \
+  --cov --cov-config=scripts/tdqs.coveragerc --cov-report=term-missing
+env -u GOOGLE_APPLICATION_CREDENTIALS uv build
+env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group tdqs \
+  python scripts/check_tool_definition_artifacts.py --output-dir /tmp/pubship-artifact-tools
+```
+
+CI requires 100% statement and branch coverage of PubShip's metadata enrichment, definition exporter, offline acceptance gate, artifact-comparison orchestration and isolated discovery bootstrap. This is a bounded code-coverage requirement, not 100% application coverage, a proof of every possible behavior or a model-scored TDQS grade. The full application suite still runs separately.
+
+Adversarial tests exercise authentic upstream reports for all three profiles, malformed collections and types, deleted warnings, substituted names, changed input hashes, stale descriptions, unreviewed candidates and discovery failures. Exporter tests prove operator settings are restored and temporary resources close on discovery failure. Contract normalization excludes description annotations while preserving a real property named `description` and description keys inside literal defaults, enums and constants.
+
+Artifact acceptance compares full SDK discovery from source, the installed wheel and a wheel rebuilt from the sdist, in all three profiles. Child interpreters run outside the checkout with isolated import paths and verify module provenance. Runtime and build dependencies come from `uv.lock`, including the development-only build group; no Google credentials or provider requests are used. Package installation may access the package index, while discovery blocks networking and ADC lookup. Persisted JSON records the imported modules and exact definitions. These comparisons run in CI, rather than relying on a one-time manual wheel check.
 
 ## Scoring and publication boundaries
 

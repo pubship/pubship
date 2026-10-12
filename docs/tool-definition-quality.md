@@ -68,11 +68,11 @@ A merged source improvement does not update an already published PyPI wheel or a
 
 ## Website claim verification
 
-Checked the website source and live pages during this delivery:
+Pre-publication website check for 0.24.2, performed October 12, 2026:
 
 | Page | Exact claim or link checked | Result |
 | --- | --- | --- |
-| Home | `uvx pubship`; published version `0.24.1` | Correct for the existing PyPI release, not these unreleased source changes. |
+| Home | `uvx pubship`; published version `0.24.1` | Matched PyPI at this pre-release check. The 0.24.2 website version update follows verified package publication. |
 | Home | "Reads are the default. Changes require explicit configuration for the app and method, the necessary Play Console permissions, and the operation's review and execution steps." | Matches the unchanged execution gates. |
 | Permissions | "Self-hosting is for your own accounts"; "pubship-server needs an exact email allowlist and keeps enrollment closed by default. There is no project endpoint." | Matches mandatory verified identity and the project boundary. |
 | Permissions | "170 implemented methods from 172 inventory definitions. Tests use synthetic providers; implementation is not a claim of live Google verification." | No method inventory or provider-verification claim changed. |

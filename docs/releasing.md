@@ -9,4 +9,4 @@ Group completed issue-linked changes into a reviewed release. Do not publish a v
 5. Configure the protected environments described in [distribution](distribution.md). Dispatch `publish-pypi.yml` with tag, accepted full commit and independently recorded checksum-manifest hash. The owner approves the deployment in GitHub.
 6. After PyPI verification, dispatch `publish-mcp-registry.yml` for the same version and accepted metadata. The owner approves it. Verify the public registry and credential-free installed command.
 
-For the first PubShip release use 0.24.0. Local migration, source publication, archiving predecessor repositories and package publication have separate owner authorization gates. Do not skip them.
+Update the version in `pyproject.toml`, `src/pubship/__init__.py`, `server.json`, both client manifests, the identity tests and `uv.lock`. Keep historical notes and independent synthetic version fixtures unchanged. Use a patch release for backward-compatible fixes; choose a minor release for new capabilities. A GitHub release is not proof of PyPI or Registry publication.

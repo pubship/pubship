@@ -1,15 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.24.2
 
 ### Changed
 
+- Use the final PubShip artwork in repository assets and operator self-host pages.
 - Explain tool parameters, result semantics and mode-specific prerequisites in actual MCP definitions.
 - Correct prepare-operation and self-host download annotations to reflect their temporary state changes. Execution permissions and confirmation gates are unchanged; clients may adjust approval prompts.
 
 ### Fixed
 
-- Keep the synthetic edit expiry stable across stdio prepare/apply calls so clock boundaries do not cause false stale-edit failures. Production stale-edit checks are unchanged.
+- Keep synthetic edit expiry stable across stdio and hosted artifact prepare/apply calls so clock boundaries do not cause false stale-edit failures. Production stale-edit checks are unchanged.
 - Bind offline TDQS reports to their exported definitions so missing findings, substituted tools and stale metadata cannot pass acceptance. Preserve literal `description` fields in contract-regression fingerprints.
 
 ### Added
@@ -40,4 +41,4 @@
 
 ## Validation
 
-This candidate must pass the full synthetic suite, lint/format, generator checks, packaging, artifact inspection, secret scanning and website checks before publication. No real Google credentials or production mutations are used for migration acceptance. Publication and deployment require separate owner gates.
+Release acceptance includes the full synthetic suite, lint/format, generator checks, packaging, artifact inspection and secret scanning. No real Google API calls are used for release validation. Published package and registry versions are verified separately from source and GitHub releases.

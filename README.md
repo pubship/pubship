@@ -96,13 +96,17 @@ Reads are the default. Optional writes and sensitive reads require explicit conf
 
 There is no project-run Google-connected service. See [the local-first decision](docs/architecture/001-local-first.md) and [self-host setup](docs/hosting.md).
 
+## Release notes
+
+[PubShip 0.24.2](docs/releases/v0.24.2.md) improves tool descriptions and approval hints, and checks the same definitions across source and packaged installs. See the [changelog](CHANGELOG.md) for earlier versions. Source versions can precede package publication.
+
 ## Development
 
 [Tool definition quality](docs/tool-definition-quality.md) documents the TDQS 1.2 offline checks, reviewed heuristic findings and MCP contract regression coverage. Offline lint is not a model-scored grade.
 
 ```sh
-env -u GOOGLE_APPLICATION_CREDENTIALS uv sync --all-extras --group browser
-env -u GOOGLE_APPLICATION_CREDENTIALS uv run pytest
+env -u GOOGLE_APPLICATION_CREDENTIALS uv sync --frozen --all-extras --group browser --group tdqs
+env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group browser --group tdqs pytest
 env -u GOOGLE_APPLICATION_CREDENTIALS uv run ruff check .
 env -u GOOGLE_APPLICATION_CREDENTIALS uv run ruff format --check .
 env -u GOOGLE_APPLICATION_CREDENTIALS uv run python scripts/generate_catalog.py --check

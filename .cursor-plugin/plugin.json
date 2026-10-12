@@ -1,6 +1,6 @@
 {
   "name": "pubship",
-  "version": "0.24.1",
+  "version": "0.24.2",
   "description": "Open-source MCP server for Google Play developer workflows. Runs locally with your own credentials.",
   "author": {
     "name": "Denys Vorobyov"

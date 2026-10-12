@@ -54,7 +54,7 @@ env -u GOOGLE_APPLICATION_CREDENTIALS uv run --frozen --all-extras --group tdqs 
   python scripts/check_tool_definition_artifacts.py --output-dir /tmp/pubship-artifact-tools
 ```
 
-CI requires 100% statement and branch coverage of PubShip's metadata enrichment, definition exporter, offline acceptance gate and artifact-comparison orchestration. This is a bounded code-coverage requirement, not 100% application coverage, a proof of every possible behavior or a model-scored TDQS grade. The full application suite still runs separately.
+CI requires 100% statement and branch coverage of PubShip's metadata enrichment, definition exporter, offline acceptance gate, artifact-comparison orchestration and isolated discovery bootstrap. This is a bounded code-coverage requirement, not 100% application coverage, a proof of every possible behavior or a model-scored TDQS grade. The full application suite still runs separately.
 
 Adversarial tests exercise authentic upstream reports for all three profiles, malformed collections and types, deleted warnings, substituted names, changed input hashes, stale descriptions, unreviewed candidates and discovery failures. Exporter tests prove operator settings are restored and temporary resources close on discovery failure. Contract normalization excludes description annotations while preserving a real property named `description` and description keys inside literal defaults, enums and constants.
 

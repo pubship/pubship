@@ -16,44 +16,6 @@ from pathlib import Path
 
 PROFILES = ("local-default", "local-all-opt-ins", "self-host")
 
-# Run with -I: neither cwd, user site packages nor PYTHONPATH can substitute an
-# editable checkout for an installed artifact. Only the source run adds src/.
-_DISCOVER = """
-import json
-import runpy
-import sys
-import sysconfig
-from pathlib import Path
-from unittest.mock import patch
-
-source, exporter, output = sys.argv[1:]
-if source != "-":
-    sys.path.insert(0, source)
-expected = (Path(source) if source != "-" else Path(sysconfig.get_path("purelib"))) / "pubship"
-expected = expected.resolve()
-sys.argv = [exporter, "--output-dir", output]
-with (
-    patch("google.auth.default", side_effect=AssertionError("ADC access prohibited")),
-    patch("socket.socket.connect", side_effect=AssertionError("Network access prohibited")),
-    patch("socket.socket.connect_ex", side_effect=AssertionError("Network access prohibited")),
-    patch("socket.getaddrinfo", side_effect=AssertionError("Network access prohibited")),
-):
-    import pubship
-    if Path(pubship.__file__).resolve().parent != expected:
-        raise RuntimeError("PubShip import did not resolve to the expected source or isolated install")
-    runpy.run_path(exporter, run_name="__main__")
-modules = {}
-for name, module in tuple(sys.modules.items()):
-    if name == "pubship" or name.startswith("pubship."):
-        filename = getattr(module, "__file__", None)
-        if filename is None or not Path(filename).resolve().is_relative_to(expected):
-            raise RuntimeError("PubShip module escaped the expected source or isolated install")
-        modules[name] = str(Path(filename).resolve())
-Path(output, "provenance.json").write_text(json.dumps({
-    "version": pubship.__version__, "package_root": str(expected), "modules": modules,
-}, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
-"""
-
 
 def clean_environment():
     """Exclude operator settings and Python import overrides from every child."""
@@ -102,6 +64,7 @@ def check_artifacts(root, dist, output):
         (output / label).mkdir()
     environment = clean_environment()
     exporter = root / "scripts/export_tool_definitions.py"
+    discovery = root / "scripts/discover_tool_definition_artifact.py"
     with tempfile.TemporaryDirectory(prefix="pubship-artifact-tools-") as temporary:
         work = Path(temporary).resolve()
         requirements = work / "requirements.txt"
@@ -128,8 +91,7 @@ def check_artifacts(root, dist, output):
             [
                 sys.executable,
                 "-I",
-                "-c",
-                _DISCOVER,
+                str(discovery),
                 str(root / "src"),
                 str(exporter),
                 str(output / "source"),
@@ -185,7 +147,7 @@ def check_artifacts(root, dist, output):
                 environment=environment,
             )
             run(
-                [str(python), "-I", "-c", _DISCOVER, "-", str(exporter), str(output / label)],
+                [str(python), "-I", str(discovery), "-", str(exporter), str(output / label)],
                 cwd=work,
                 environment=environment,
             )

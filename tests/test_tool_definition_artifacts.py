@@ -16,6 +16,8 @@ import pytest
 _SCRIPT = runpy.run_path(
     str(Path(__file__).parents[1] / "scripts/check_tool_definition_artifacts.py")
 )
+_DISCOVERY_PATH = Path(__file__).parents[1] / "scripts/discover_tool_definition_artifact.py"
+_DISCOVERY = runpy.run_path(str(_DISCOVERY_PATH))
 check_artifacts = _SCRIPT["check_artifacts"]
 compare_definitions = _SCRIPT["compare_definitions"]
 
@@ -58,7 +60,7 @@ def artifact_run(tmp_path, monkeypatch):
             rebuild = Path(command[command.index("--out-dir") + 1])
             rebuild.mkdir()
             (rebuild / "pubship-0.24.1-py3-none-any.whl").write_bytes(b"synthetic")
-        elif "-c" in command:
+        elif "-I" in command:
             write_definitions(Path(command[-1]))
 
     monkeypatch.setitem(check_artifacts.__globals__, "run", fake_run)
@@ -93,8 +95,11 @@ def test_artifact_discovery_uses_isolated_installs_and_frozen_dependencies(
             assert not cwd.is_relative_to(root)
         if command[:3] == ["uv", "pip", "sync"]:
             assert "--require-hashes" in command
-        if "-c" in command:
-            assert command[1:3] == ["-I", "-c"]
+        if "-I" in command:
+            assert command[1:3] == [
+                "-I",
+                str(root / "scripts/discover_tool_definition_artifact.py"),
+            ]
             assert command[-3] == (str(root / "src") if command[-1].endswith("/source") else "-")
     assert (output / "source/local-default.json").is_file()
     assert (output / "wheel/local-all-opt-ins.json").is_file()
@@ -252,11 +257,11 @@ def test_discovery_bootstrap_enforces_import_provenance(monkeypatch, tmp_path, i
     monkeypatch.setattr(runpy, "run_path", fake_export)
     if failure:
         with pytest.raises(RuntimeError, match="expected source or isolated install"):
-            exec(_SCRIPT["_DISCOVER"], {})
+            _DISCOVERY["main"]()
         assert not (output / "provenance.json").exists()
         assert len(exports) == (0 if failure == "package_origin" else 1)
     else:
-        exec(_SCRIPT["_DISCOVER"], {})
+        _DISCOVERY["main"]()
         provenance = json.loads((output / "provenance.json").read_text())
         assert provenance["package_root"] == str(package_root.resolve())
         assert provenance["version"] == "0.24.1"
@@ -282,4 +287,11 @@ def test_script_entrypoint_rejects_missing_cli_arguments(monkeypatch):
             str(Path(__file__).parents[1] / "scripts/check_tool_definition_artifacts.py"),
             run_name="__main__",
         )
+    assert error.value.code == 2
+
+
+def test_discovery_helper_entrypoint_rejects_missing_cli_arguments(monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["discover"])
+    with pytest.raises(SystemExit) as error:
+        runpy.run_path(str(_DISCOVERY_PATH), run_name="__main__")
     assert error.value.code == 2

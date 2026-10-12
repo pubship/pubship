@@ -56,6 +56,7 @@ async def export_definitions() -> dict[str, dict]:
         patch(
             "pubship.auth.Auth.token", side_effect=AssertionError("Credential access prohibited")
         ),
+        patch("google.auth.default", side_effect=AssertionError("ADC access prohibited")),
         patch("socket.socket.connect", side_effect=AssertionError("Network access prohibited")),
         patch("socket.socket.connect_ex", side_effect=AssertionError("Network access prohibited")),
         patch("socket.getaddrinfo", side_effect=AssertionError("Network access prohibited")),

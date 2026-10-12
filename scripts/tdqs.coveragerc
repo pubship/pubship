@@ -1,0 +1,11 @@
+[run]
+branch = True
+include =
+    */src/pubship/tool_metadata.py
+    */scripts/export_tool_definitions.py
+    */scripts/check_tool_definitions.py
+    */scripts/check_tool_definition_artifacts.py
+
+[report]
+show_missing = True
+fail_under = 100

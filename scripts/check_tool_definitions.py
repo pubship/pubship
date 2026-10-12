@@ -4,6 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
+from tdqs.lint_server import lint_server
+from tdqs.parse_tool_definitions import parse_tool_definitions
+
 PROFILES = {"local-default": 13, "local-all-opt-ins": 41, "self-host": 46}
 # Reviewed in docs/tool-definition-quality.md. Keep raw upstream reports intact.
 SHADOW_DISPOSITIONS = {
@@ -16,47 +19,43 @@ SHADOW_DISPOSITIONS = {
 }
 
 
-def check_report(profile: str, report: dict) -> int:
-    """Reject new findings, missing coverage and unreviewed structural candidates."""
-    if report.get("specVersion") != "1.2":
+def check_report(profile: str, report: dict, definitions: dict) -> int:
+    """Bind the report to the exported tools, then reject unreviewed lint findings."""
+    if profile not in PROFILES:
+        raise ValueError("Unknown tool-definition profile")
+    tools = parse_tool_definitions(definitions).tools
+    if len(tools) != PROFILES[profile]:
+        raise ValueError(f"{profile}: unexpected exported tool count")
+    # Lint is a pure, offline calculation. Reproduce every finding, input hash,
+    # coverage signal and candidate instead of trusting report summary fields.
+    expected = lint_server(server_name=profile, tools=tools).model_dump(by_alias=True)
+    if expected["specVersion"] != "1.2":
         raise ValueError("Review the changed TDQS specification before accepting this report.")
-    if report.get("server") != {"name": profile, "toolCount": PROFILES[profile]}:
-        raise ValueError(f"{profile}: unexpected server identity or tool count")
-    tools = report.get("tools", [])
-    if len(tools) != PROFILES[profile] or len({tool["name"] for tool in tools}) != len(tools):
-        raise ValueError(f"{profile}: incomplete or duplicate tool results")
-    for tool in tools:
-        if tool.get("flags") or tool["contextSignals"]["schemaDescriptionCoverage"] != 100:
+    if (
+        not isinstance(report, dict)
+        or not isinstance(report.get("generatedAt"), str)
+        or not report["generatedAt"].strip()
+    ):
+        raise ValueError(f"{profile}: missing report generation timestamp")
+    # The timestamp is the only nondeterministic field. Compare serialized JSON
+    # so Python's bool/int and int/float equality cannot conceal malformed types.
+    expected["generatedAt"] = report["generatedAt"]
+    if json.dumps(report, sort_keys=True, allow_nan=False) != json.dumps(
+        expected, sort_keys=True, allow_nan=False
+    ):
+        raise ValueError(f"{profile}: report does not match the exported tool definitions")
+    for tool in expected["tools"]:
+        if tool["flags"] or tool["contextSignals"]["schemaDescriptionCoverage"] != 100:
             raise ValueError(f"{profile}/{tool['name']}: flags or missing parameter descriptions")
-    candidates = report.get("shadowCandidates", [])
+    candidates = expected["shadowCandidates"]
     keys = {
         (c["tool"], c["cheaperSibling"], c["invocationCost"], c["cheaperSiblingInvocationCost"])
         for c in candidates
     }
-    if len(keys) != len(candidates) or not keys <= SHADOW_DISPOSITIONS[profile]:
+    if not keys <= SHADOW_DISPOSITIONS[profile]:
         raise ValueError(f"{profile}: new or changed shadow candidate requires review")
-    expected_prefixes = {
-        tool: f"{tool} (invocation cost {cost}) may be shadowed by {sibling} (cost {other}): "
-        for tool, sibling, cost, other in keys
-    }
-    findings = report.get("findings", [])
-    if len(findings) != len(keys) or len({f.get("tool") for f in findings}) != len(keys):
-        raise ValueError(f"{profile}: inconsistent shadow-candidate findings")
-    for finding in findings:
-        if (
-            finding.get("rule") != "shadow-candidate"
-            or finding.get("severity") != "warning"
-            or finding.get("tool") not in expected_prefixes
-            or not finding.get("message", "").startswith(
-                expected_prefixes.get(finding.get("tool"), "\0")
-            )
-        ):
-            raise ValueError(f"{profile}: unresolved upstream lint finding")
-    # Also inspect per-tool findings, so a malformed aggregate cannot hide a warning.
-    for tool in tools:
-        for finding in tool.get("findings", []):
-            if finding not in report.get("findings", []):
-                raise ValueError(f"{profile}/{tool['name']}: unreported per-tool finding")
+    if any(finding["rule"] != "shadow-candidate" for finding in expected["findings"]):
+        raise ValueError(f"{profile}: unresolved upstream lint finding")
     return len(candidates)
 
 
@@ -66,7 +65,8 @@ def main():
     args = parser.parse_args()
     for profile, count in PROFILES.items():
         report = json.loads((args.reports_dir / f"{profile}-lint.json").read_text())
-        dispositions = check_report(profile, report)
+        definitions = json.loads((args.reports_dir / f"{profile}.json").read_text())
+        dispositions = check_report(profile, report, definitions)
         print(
             f"{profile}: {count} tools; 100% parameter descriptions; "
             f"{dispositions} reviewed structural candidates; no unresolved lint findings"

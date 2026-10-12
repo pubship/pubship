@@ -10,11 +10,13 @@
 ### Fixed
 
 - Keep the synthetic edit expiry stable across stdio prepare/apply calls so clock boundaries do not cause false stale-edit failures. Production stale-edit checks are unchanged.
+- Bind offline TDQS reports to their exported definitions so missing findings, substituted tools and stale metadata cannot pass acceptance. Preserve literal `description` fields in contract-regression fingerprints.
 
 ### Added
 
 - Pinned offline TDQS 1.2 lint for all three tool surfaces, with explicit review of structural heuristic candidates.
 - Contract regression checks for tool ordering, schemas, defaults, annotations and caller overrides.
+- Adversarial TDQS acceptance coverage and CI comparisons of source, installed-wheel and sdist-derived tool definitions across all three profiles.
 
 ## 0.24.1
 

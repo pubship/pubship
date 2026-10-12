@@ -133,6 +133,6 @@ codex mcp add pubship --url https://operator.example.test/mcp
 claude mcp add --transport http pubship https://operator.example.test/mcp
 ```
 
-These commands illustrate client configuration, not a verified public service or a claim that every desktop client version has passed acceptance. Start locally with `uvx pubship` after publication. For a credential-free CLI check use `pubship --check`.
+These commands illustrate client configuration, not a verified public service or a claim that every desktop client version has passed acceptance. Start locally with `uvx pubship`. For a credential-free CLI check use `uvx pubship --check`.
 
 Optional HTTP capabilities must be explicitly requested and consented. Read [capability contracts](hosted-capabilities.md) and [transfer-client limits](hosted-transfers.md) before requesting changes or file delivery. Client transcripts and tool results follow the client's own retention policy. Disconnect through `disconnect_google_account` and revoke Google consent when no longer needed.
